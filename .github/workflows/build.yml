@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -23,8 +23,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes clang libclang-dev
 
-      - name: Build
-        run: cargo build --locked
+      - name: Build release library
+        run: cargo build --locked --release
 
       - name: Test
         run: cargo test --locked
+
+      - name: Upload library
+        uses: actions/upload-artifact@v7
+        with:
+          name: sepatch-linux-x86_64-${{ github.sha }}
+          path: target/release/libsepatch.rlib
+          if-no-files-found: error
+          retention-days: 90
